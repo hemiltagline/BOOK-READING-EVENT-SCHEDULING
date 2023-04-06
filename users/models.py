@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.hashers import make_password
 
 
 class CustomUserManager(BaseUserManager):
@@ -19,8 +20,8 @@ class CustomUserManager(BaseUserManager):
         if User.objects.filter(email=email, user_type=user_type).exists():
             raise ValueError("User with same email and user_type already exists.")
 
+        extra_fields["password"] = make_password(password)
         user = self.model(email=self.normalize_email(email), **extra_fields)
-        user.set_password(password)
         user.save(using=self._db)
         return user
 
@@ -37,14 +38,14 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    ORGANIZER = "organizer"
-    CUSTOMER = "customer"
+    ORGANIZER = "ORGANIZER"
+    CUSTOMER = "CUSTOMER"
 
     USER_TYPE = [
-        (ORGANIZER, "Organizer"),
-        (CUSTOMER, "Customer"),
+        (ORGANIZER, "ORGANIZER"),
+        (CUSTOMER, "CUSTOMER"),
     ]
-
+    username = models.CharField(max_length=150, blank=True, null=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     email = models.EmailField(unique=True)
@@ -71,21 +72,3 @@ class User(AbstractUser):
 
     def get_short_name(self):
         return self.first_name
-
-    # def _generate_activation_token(self, obj):
-    #     """
-    #     Generates a unique activation token for the given user.
-    #     """
-    #     token_data = [str(obj.id), obj.email, ",".join(obj.user_type)]
-    #     return default_token_generator.make_token(obj, ",".join(token_data))
-
-    # def send_activation_email(self):
-    #     token = self._generate_activation_token()
-    #     activation_link = f"{settings.BASE_URL}/activate/?token={token}"
-    #     subject = "Activate your account"
-    #     message = f"Please click the link below to activate your account:\n\n{activation_link}"
-    #     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email])
-
-    # def activate(self):
-    #     self.is_active = True
-    #     self.save()
