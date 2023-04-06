@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "multiselectfield",
     "users",
     "books",
+    "cities",
 ]
 
 MIDDLEWARE = [
