@@ -47,7 +47,7 @@ class User(AbstractUser):
 
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    email = models.EmailField(blank=True)
+    email = models.EmailField(unique=True)
     phone_number = PhoneNumberField(
         verbose_name="Phone no.",
         help_text="Provide a number with country code (e.g. +12125552368).",
