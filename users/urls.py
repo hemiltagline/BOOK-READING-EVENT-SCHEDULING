@@ -14,5 +14,4 @@ urlpatterns = [
         ),
         name="user",
     ),
-    path("user/<int:pk>/", UserDeleteView.as_view(), name="user_delete"),
 ]
