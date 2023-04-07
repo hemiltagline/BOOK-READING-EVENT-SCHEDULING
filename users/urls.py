@@ -1,17 +1,18 @@
 from django.urls import path
-from users.views import UserViewSet, UserCreateView, UserDeleteView
+from users.views import UserViewSet, UserCreateView, UserDeleteView, UserLoginView
 
 urlpatterns = [
-    # path("sign-in/", admin.site.urls),
-    # path("sign-up/", include("users.urls")),
+    path("sign-up/", UserCreateView.as_view(), name="create-user"),
+    path("sign-in/", UserLoginView.as_view(), name="login-user"),
     path(
         "users/", UserViewSet.as_view({"get": "list", "post": "create"}), name="users"
     ),
     path(
         "user/<int:pk>/",
-        UserViewSet.as_view({"get": "retrieve", "put": "update", "delete": "destroy"}),
+        UserViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
         name="user",
     ),
-    path("sign-up/", UserCreateView.as_view(), name="create-user"),
     path("user/<int:pk>/", UserDeleteView.as_view(), name="user_delete"),
 ]
