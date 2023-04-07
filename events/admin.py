@@ -1,3 +1,6 @@
 from django.contrib import admin
+from events.models import Event, EventListingsInCity, ProductListingsInEvent
 
-# Register your models here.
+admin.site.register(Event)
+admin.site.register(EventListingsInCity)
+admin.site.register(ProductListingsInEvent)
