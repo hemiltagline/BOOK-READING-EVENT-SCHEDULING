@@ -3,6 +3,8 @@ from .models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from datetime import datetime
 from django.contrib.auth import authenticate
+from rest_framework import status
+from rest_framework.response import Response
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -73,7 +75,7 @@ class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
             if not user:
                 raise serializers.ValidationError("Invalid email or password.")
 
-            if not user.user_type == user_type:
+            if user_type not in list(user.user_type):
                 raise serializers.ValidationError("Invalid user type.")
 
             refresh = self.get_token(user, user_type)
