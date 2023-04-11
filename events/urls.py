@@ -3,6 +3,7 @@ from .views import (
     EventViewSet,
     ProductListingViewSet,
     EventListingsInCityViewSet,
+    TicketViewSet,
 )
 
 urlpatterns = [
@@ -37,5 +38,17 @@ urlpatterns = [
             {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
         ),
         name="event-listing-detail",
+    ),
+    path(
+        "tickets/",
+        TicketViewSet.as_view({"get": "list", "post": "create"}),
+        name="tickets",
+    ),
+    path(
+        "tickets/<int:pk>/",
+        TicketViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="ticket-detail",
     ),
 ]
