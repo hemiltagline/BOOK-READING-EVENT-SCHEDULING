@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Genre, Book
+from .models import Genre, Book, Product
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -17,3 +17,9 @@ class BookSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep["genre"] = GenreSerializer(instance=instance.genre).data
         return rep
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = "__all__"
