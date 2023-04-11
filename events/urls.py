@@ -2,6 +2,7 @@ from django.urls import path, include
 from .views import (
     EventViewSet,
     ProductListingViewSet,
+    EventListingsInCityViewSet,
 )
 
 urlpatterns = [
@@ -24,5 +25,17 @@ urlpatterns = [
             {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
         ),
         name="product-listing-detail",
+    ),
+    path(
+        "event-cities-listings/",
+        EventListingsInCityViewSet.as_view({"get": "list", "post": "create"}),
+        name="event-listings",
+    ),
+    path(
+        "event-cities-listings/<int:pk>/",
+        EventListingsInCityViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="event-listing-detail",
     ),
 ]
