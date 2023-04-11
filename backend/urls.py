@@ -25,7 +25,7 @@ urlpatterns = [
     path("", include("users.urls")),
     path("cities/", include("cities.urls")),
     path("books/", include("books.urls")),
-    # path("events/", include("events.urls")),
+    path("events/", include("events.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
