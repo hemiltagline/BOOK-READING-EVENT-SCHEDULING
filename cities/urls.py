@@ -1,11 +1,15 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import CitiesPageViewSet, CityDetail
-
-router = DefaultRouter()
-router.register(r"", CitiesPageViewSet)
+from django.urls import path
+from .views import CitiesPageViewSet
 
 urlpatterns = [
-    path("", include(router.urls)),
-    path("<int:pk>/", CityDetail.as_view(), name="get_update_delete_city"),
+    path(
+        "", CitiesPageViewSet.as_view({"get": "list", "post": "create"}), name="cities"
+    ),
+    path(
+        "<int:pk>/",
+        CitiesPageViewSet.as_view(
+            {"get": "retrieve", "patch": "partial_update", "delete": "destroy"}
+        ),
+        name="get_update_delete_city",
+    ),
 ]
