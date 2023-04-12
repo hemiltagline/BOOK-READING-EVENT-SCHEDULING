@@ -9,12 +9,25 @@ from .serializers import (
 )
 from rest_framework.permissions import IsAuthenticated
 from backend.utils import OrganizerPermission, CustomerPermission
+from datetime import timedelta
+from django.utils import timezone
 
 
 class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def create(self, request):
         OrganizerPermission(request)
@@ -28,8 +41,17 @@ class EventViewSet(viewsets.ModelViewSet):
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
 
-    def patch(self, request, pk=None):
+    def update(self, request, pk=None, *args, **kwargs):
         OrganizerPermission(request)
+        event_obj = Event.objects.filter(id=pk).first()
+        # If the event is cancelled and cannot be cancelled, raise a ValidationError
+        if event_obj.status == Event.CANCELLED and not (
+            event_obj.start_time > timezone.now() + timedelta(hours=24)
+        ):
+            return Response(
+                {"detail": "Cannot cancel event less than 24 hours before start time."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)

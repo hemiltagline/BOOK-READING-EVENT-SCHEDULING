@@ -1,62 +1,108 @@
 from .models import Genre, Book, Product
 from .serializers import GenreSerializer, BookSerializer, ProductSerializer
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
+from backend.utils import OrganizerPermission
+from rest_framework import viewsets
 
 
-class GenreViewSet(ListCreateAPIView):
+class GenreDetail(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
+    def create(self, request):
+        OrganizerPermission(request)
+        data = request.data
+        serializer = self.get_serializer(data=data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
-class GenreDetail(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Genre.objects.all()
-    serializer_class = GenreSerializer
+    def patch(self, request, pk=None):
+        OrganizerPermission(request)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
-    def delete(self, request, pk, *args, **kwargs):
-        self.destroy(request, *args, **kwargs)
+    def destroy(self, request, pk=None):
+        OrganizerPermission(request)
+        instance = self.get_object()
+        self.perform_destroy(instance)
         return Response(
             {"id": pk, "message": "Genre deleted successfully"},
             status=status.HTTP_204_NO_CONTENT,
         )
 
 
-class BookList(ListCreateAPIView):
+class BookDetail(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
+    def create(self, request):
+        OrganizerPermission(request)
+        data = request.data
+        serializer = self.get_serializer(data=data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
-class BookDetail(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
+    def patch(self, request, pk=None):
+        OrganizerPermission(request)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
-    def delete(self, request, pk, *args, **kwargs):
-        self.destroy(request, *args, **kwargs)
+    def destroy(self, request, pk=None):
+        OrganizerPermission(request)
+        instance = self.get_object()
+        self.perform_destroy(instance)
         return Response(
             {"id": pk, "message": "Book deleted successfully"},
             status=status.HTTP_204_NO_CONTENT,
         )
 
 
-class ProductList(ListCreateAPIView):
+class ProductDetail(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def create(self, request):
+        OrganizerPermission(request)
+        data = request.data
+        serializer = self.get_serializer(data=data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
-class ProductDetail(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    def patch(self, request, pk=None):
+        OrganizerPermission(request)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
-    def delete(self, request, pk, *args, **kwargs):
-        self.destroy(request, *args, **kwargs)
+    def destroy(self, request, pk=None):
+        OrganizerPermission(request)
+        instance = self.get_object()
+        self.perform_destroy(instance)
         return Response(
             {"id": pk, "message": "Product deleted successfully"},
             status=status.HTTP_204_NO_CONTENT,
