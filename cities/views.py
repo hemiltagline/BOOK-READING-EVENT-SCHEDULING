@@ -12,9 +12,22 @@ class CitiesPageViewSet(viewsets.ModelViewSet):
     queryset = CitiesPage.objects.all()
     serializer_class = CitiesPageSerializer
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.queryset.filter(created_by=request.user.id)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def create(self, request):
         OrganizerPermission(request)
         data = request.data
+        data["created_by"] = request.user.id
+        data["updated_by"] = request.user.id
         serializer = self.get_serializer(data=data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -25,8 +38,10 @@ class CitiesPageViewSet(viewsets.ModelViewSet):
 
     def patch(self, request, pk=None):
         OrganizerPermission(request)
+        data = request.data
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        data["updated_by"] = request.user.id
+        serializer = self.get_serializer(instance, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)

@@ -1,7 +1,8 @@
 from django.db import models
+from backend.models import BaseModel
 
 
-class CitiesPage(models.Model):
+class CitiesPage(BaseModel):
     city_name = models.CharField(max_length=200)
     state = models.CharField(max_length=200)
     country = models.CharField(max_length=200)
