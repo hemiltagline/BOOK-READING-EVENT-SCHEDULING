@@ -19,7 +19,7 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.queryset.filter(created_by=request.user.id)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -33,6 +33,8 @@ class EventViewSet(viewsets.ModelViewSet):
         OrganizerPermission(request)
         data = request.data
         data["organizer"] = request.user.id
+        data["created_by"] = request.user.id
+        data["updated_by"] = request.user.id
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -52,8 +54,10 @@ class EventViewSet(viewsets.ModelViewSet):
                 {"detail": "Cannot cancel event less than 24 hours before start time."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        data = request.data
+        data["updated_by"] = request.user.id
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer = self.get_serializer(instance, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
@@ -70,9 +74,22 @@ class ProductListingViewSet(viewsets.ModelViewSet):
     queryset = ProductListingsInEvent.objects.all()
     serializer_class = ProductListingsInEventSerializer
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.queryset.filter(created_by=request.user.id)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def create(self, request):
         OrganizerPermission(request)
         data = request.data
+        data["created_by"] = request.user.id
+        data["updated_by"] = request.user.id
         serializer = self.get_serializer(data=data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -83,8 +100,10 @@ class ProductListingViewSet(viewsets.ModelViewSet):
 
     def patch(self, request, pk=None):
         OrganizerPermission(request)
+        data = request.data
+        data["updated_by"] = request.user.id
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer = self.get_serializer(instance, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
@@ -101,9 +120,23 @@ class EventListingsInCityViewSet(viewsets.ModelViewSet):
     queryset = EventListingsInCity.objects.all()
     serializer_class = EventListingsInCitySerializer
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.queryset.filter(created_by=request.user.id)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         OrganizerPermission(request)
-        serializer = self.get_serializer(data=request.data)
+        data = request.data
+        data["created_by"] = request.user.id
+        data["updated_by"] = request.user.id
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -111,8 +144,10 @@ class EventListingsInCityViewSet(viewsets.ModelViewSet):
     def patch(self, request, *args, **kwargs):
         OrganizerPermission(request)
         partial = kwargs.pop("partial", False)
+        data = request.data
+        data["updated_by"] = request.user.id
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
@@ -128,6 +163,17 @@ class TicketViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.queryset.filter(user=request.user)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         CustomerPermission(request)

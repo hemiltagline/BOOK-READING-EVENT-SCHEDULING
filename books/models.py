@@ -1,7 +1,8 @@
 from django.db import models
+from backend.models import BaseModel
 
 
-class Genre(models.Model):
+class Genre(BaseModel):
     name = models.CharField(max_length=200)
     description = models.TextField(max_length=1000)
 
@@ -9,7 +10,7 @@ class Genre(models.Model):
         return self.name
 
 
-class Product(models.Model):
+class Product(BaseModel):
     name = models.CharField(max_length=200)
     description = models.TextField(max_length=1000)
     image = models.ImageField(upload_to="product_images/", null=True, blank=True)
@@ -19,7 +20,7 @@ class Product(models.Model):
         return self.name
 
 
-class Book(models.Model):
+class Book(BaseModel):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=200)
     genre = models.ForeignKey(
